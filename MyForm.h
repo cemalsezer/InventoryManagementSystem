@@ -19,6 +19,9 @@ namespace InventoryManagementSystem {
 		MyForm(void)
 		{
 			InitializeComponent();
+			this->Load += gcnew System::EventHandler(this, &MyForm::MyForm_Load);
+			this->dataGridViewInventory->CellClick += gcnew System::Windows::Forms::DataGridViewCellEventHandler(this, &MyForm::dataGridViewInventory_CellClick);
+
 			//
 			//TODO: Add the constructor code here
 			//
@@ -42,6 +45,8 @@ namespace InventoryManagementSystem {
 	private: System::Windows::Forms::NumericUpDown^ numQuantity;
 	private: System::Windows::Forms::TextBox^ txtUnitPrice;
 	private: System::Windows::Forms::Button^ btnAddItem;
+	private: System::Windows::Forms::TextBox^ txtItemID;
+	private: System::Windows::Forms::Button^ btnUpdateItem;
 	protected:
 
 	private:
@@ -64,6 +69,8 @@ namespace InventoryManagementSystem {
 			this->numQuantity = (gcnew System::Windows::Forms::NumericUpDown());
 			this->txtUnitPrice = (gcnew System::Windows::Forms::TextBox());
 			this->btnAddItem = (gcnew System::Windows::Forms::Button());
+			this->txtItemID = (gcnew System::Windows::Forms::TextBox());
+			this->btnUpdateItem = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewInventory))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->BeginInit();
 			this->SuspendLayout();
@@ -118,19 +125,38 @@ namespace InventoryManagementSystem {
 			// 
 			// btnAddItem
 			// 
-			this->btnAddItem->Location = System::Drawing::Point(61, 540);
+			this->btnAddItem->Location = System::Drawing::Point(52, 541);
 			this->btnAddItem->Name = L"btnAddItem";
-			this->btnAddItem->Size = System::Drawing::Size(87, 33);
+			this->btnAddItem->Size = System::Drawing::Size(109, 33);
 			this->btnAddItem->TabIndex = 6;
-			this->btnAddItem->Text = L"button1";
+			this->btnAddItem->Text = L"Product Add";
 			this->btnAddItem->UseVisualStyleBackColor = true;
 			this->btnAddItem->Click += gcnew System::EventHandler(this, &MyForm::btnAddItem_Click);
+			// 
+			// txtItemID
+			// 
+			this->txtItemID->Location = System::Drawing::Point(287, 367);
+			this->txtItemID->Name = L"txtItemID";
+			this->txtItemID->Size = System::Drawing::Size(122, 22);
+			this->txtItemID->TabIndex = 7;
+			// 
+			// btnUpdateItem
+			// 
+			this->btnUpdateItem->Location = System::Drawing::Point(287, 468);
+			this->btnUpdateItem->Name = L"btnUpdateItem";
+			this->btnUpdateItem->Size = System::Drawing::Size(124, 31);
+			this->btnUpdateItem->TabIndex = 8;
+			this->btnUpdateItem->Text = L"Update";
+			this->btnUpdateItem->UseVisualStyleBackColor = true;
+			this->btnUpdateItem->Click += gcnew System::EventHandler(this, &MyForm::btnUpdateItem_Click);
 			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1055, 643);
+			this->Controls->Add(this->btnUpdateItem);
+			this->Controls->Add(this->txtItemID);
 			this->Controls->Add(this->btnAddItem);
 			this->Controls->Add(this->txtUnitPrice);
 			this->Controls->Add(this->numQuantity);
@@ -202,5 +228,41 @@ namespace InventoryManagementSystem {
 			MessageBox::Show("Ürün eklenirken hata oluştu.", "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
 		}
 	}
+		private: System::Void btnUpdateItem_Click(System::Object^ sender, System::EventArgs^ e) {
+
+			int itemID = Convert::ToInt32(txtItemID->Text);
+			String^ itemName = txtItemName->Text;
+			int categoryId = Convert::ToInt32(cmbCategory->SelectedValue);
+			int quantity = Convert::ToInt32(numQuantity->Value);
+			double unitPrice = Convert::ToDouble(txtUnitPrice->Text);
+
+			if (String::IsNullOrEmpty(itemName) || categoryId <= 0 || quantity <= 0 || unitPrice <= 0) {
+				MessageBox::Show("Lütfen tüm alanları eksiksiz ve doğru giriniz!", "Uyarı", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+				return;
+			}
+
+			DatabaseManager^ dbManager = gcnew DatabaseManager();
+			bool success = dbManager->UpdateItem(itemID, itemName, categoryId, quantity, unitPrice);
+
+			if (success) {
+				MessageBox::Show("Ürün başarıyla güncellendi!", "Bilgi", MessageBoxButtons::OK, MessageBoxIcon::Information);
+				LoadInventoryData();  // **Güncelleme sonrası DataGridView'i yenile**
+			}
+			else {
+				MessageBox::Show("Ürün güncellenirken hata oluştu.", "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+			}
+		}
+		private: System::Void dataGridViewInventory_CellClick(System::Object^ sender, System::Windows::Forms::DataGridViewCellEventArgs^ e) {
+			if (e->RowIndex >= 0) {  // Eğer geçerli bir satır tıklandıysa
+				DataGridViewRow^ row = dataGridViewInventory->Rows[e->RowIndex];
+
+				txtItemID->Text = row->Cells["ItemID"]->Value->ToString();  // **Gizli ID**
+				txtItemName->Text = row->Cells["ItemName"]->Value->ToString();
+				cmbCategory->Text = row->Cells["CategoryName"]->Value->ToString();
+				numQuantity->Value = Convert::ToInt32(row->Cells["Quantity"]->Value);
+				txtUnitPrice->Text = row->Cells["UnitPrice"]->Value->ToString();
+			}
+		}
+
 };
 }

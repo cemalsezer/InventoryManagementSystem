@@ -97,4 +97,28 @@ namespace InventoryManagementSystem {
         return dt;
     }
 
+    bool DatabaseManager::UpdateItem(int itemID, String^ itemName, int categoryId, int quantity, double unitPrice) {
+        try {
+            OpenConnection();
+
+            String^ query = "UPDATE Items SET ItemName=@itemName, CategoryID=@categoryId, Quantity=@quantity, UnitPrice=@unitPrice WHERE ItemID=@itemID";
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+            cmd->Parameters->AddWithValue("@itemName", itemName);
+            cmd->Parameters->AddWithValue("@categoryId", categoryId);
+            cmd->Parameters->AddWithValue("@quantity", quantity);
+            cmd->Parameters->AddWithValue("@unitPrice", unitPrice);
+            cmd->Parameters->AddWithValue("@itemID", itemID);
+
+            int result = cmd->ExecuteNonQuery();
+            CloseConnection();
+
+            return result > 0;  // Eğer satır değiştiyse true döndür
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show("Ürün güncelleme hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            return false;
+        }
+    }
+
+
 }

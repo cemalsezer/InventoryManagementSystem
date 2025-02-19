@@ -18,6 +18,8 @@ namespace InventoryManagementSystem {
         DataTable^ GetInventoryData();  // **Eksikse ekle!**
         DataTable^ GetCategories();
         bool AddNewItem(String^ itemName, int categoryId, int quantity, double unitPrice);  
+        bool UpdateItem(int itemID, String^ itemName, int categoryId, int quantity, double unitPrice);
+
     };
 
 
