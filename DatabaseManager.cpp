@@ -20,10 +20,10 @@ namespace InventoryManagementSystem {
             return true;
         }
         catch (SqlException^ ex) {  // SQL bağlantı hatalarını yakalar
-            MessageBox::Show("SQL Bağlantı Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("SQL Baglanti Hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         catch (Exception^ ex) {  // Genel bağlantı hatalarını yakalar
-            MessageBox::Show("Bağlantı hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Bağlanti hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         isConnected = false;
         return false;
@@ -55,8 +55,46 @@ namespace InventoryManagementSystem {
             CloseConnection();
         }
         catch (Exception^ ex) {
-            MessageBox::Show("Veri çekme hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Veri cekme hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         return dt;
     }
+
+    bool DatabaseManager::AddNewItem(String^ itemName, int categoryId, int quantity, double unitPrice) {
+        try {
+            OpenConnection();
+
+            String^ query = "INSERT INTO Items (ItemName, CategoryID, Quantity, UnitPrice) VALUES (@itemName, @categoryId, @quantity, @unitPrice)";
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+            cmd->Parameters->AddWithValue("@itemName", itemName);
+            cmd->Parameters->AddWithValue("@categoryId", categoryId);
+            cmd->Parameters->AddWithValue("@quantity", quantity);
+            cmd->Parameters->AddWithValue("@unitPrice", unitPrice);
+
+            int result = cmd->ExecuteNonQuery();
+            CloseConnection();
+
+            return result > 0;  // Eğer satır eklendiyse true döndür
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show("Urun ekleme hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            return false;
+        }
+    }
+
+    DataTable^ DatabaseManager::GetCategories() {
+        DataTable^ dt = gcnew DataTable();
+        try {
+            OpenConnection();
+            String^ query = "SELECT CategoryID, CategoryName FROM Categories";
+            SqlDataAdapter^ adapter = gcnew SqlDataAdapter(query, sqlConnection);
+            adapter->Fill(dt);
+            CloseConnection();
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show("Kategori yukleme hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+        }
+        return dt;
+    }
+
 }

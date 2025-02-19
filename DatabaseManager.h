@@ -16,5 +16,9 @@ namespace InventoryManagementSystem {
         void CloseConnection();
         bool GetConnectionStatus();
         DataTable^ GetInventoryData();  // **Eksikse ekle!**
+        DataTable^ GetCategories();
+        bool AddNewItem(String^ itemName, int categoryId, int quantity, double unitPrice);  
     };
+
+
 }
