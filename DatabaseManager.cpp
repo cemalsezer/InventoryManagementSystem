@@ -120,5 +120,24 @@ namespace InventoryManagementSystem {
         }
     }
 
+    bool DatabaseManager::DeleteItem(int itemID) {
+        try {
+            OpenConnection();
+
+            String^ query = "DELETE FROM Items WHERE ItemID=@itemID";
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+            cmd->Parameters->AddWithValue("@itemID", itemID);
+
+            int result = cmd->ExecuteNonQuery();
+            CloseConnection();
+
+            return result > 0;  // Eğer satır silindiyse true döndür
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show("Ürün silme hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            return false;
+        }
+    }
+
 
 }

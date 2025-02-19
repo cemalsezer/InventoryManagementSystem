@@ -19,6 +19,8 @@ namespace InventoryManagementSystem {
         DataTable^ GetCategories();
         bool AddNewItem(String^ itemName, int categoryId, int quantity, double unitPrice);  
         bool UpdateItem(int itemID, String^ itemName, int categoryId, int quantity, double unitPrice);
+        bool DeleteItem(int itemID);
+
 
     };
 

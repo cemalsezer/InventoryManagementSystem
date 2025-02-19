@@ -47,6 +47,7 @@ namespace InventoryManagementSystem {
 	private: System::Windows::Forms::Button^ btnAddItem;
 	private: System::Windows::Forms::TextBox^ txtItemID;
 	private: System::Windows::Forms::Button^ btnUpdateItem;
+	private: System::Windows::Forms::Button^ btnDeleteItem;
 	protected:
 
 	private:
@@ -71,6 +72,7 @@ namespace InventoryManagementSystem {
 			this->btnAddItem = (gcnew System::Windows::Forms::Button());
 			this->txtItemID = (gcnew System::Windows::Forms::TextBox());
 			this->btnUpdateItem = (gcnew System::Windows::Forms::Button());
+			this->btnDeleteItem = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewInventory))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->BeginInit();
 			this->SuspendLayout();
@@ -150,11 +152,22 @@ namespace InventoryManagementSystem {
 			this->btnUpdateItem->UseVisualStyleBackColor = true;
 			this->btnUpdateItem->Click += gcnew System::EventHandler(this, &MyForm::btnUpdateItem_Click);
 			// 
+			// btnDeleteItem
+			// 
+			this->btnDeleteItem->Location = System::Drawing::Point(287, 518);
+			this->btnDeleteItem->Name = L"btnDeleteItem";
+			this->btnDeleteItem->Size = System::Drawing::Size(124, 30);
+			this->btnDeleteItem->TabIndex = 9;
+			this->btnDeleteItem->Text = L"Delete";
+			this->btnDeleteItem->UseVisualStyleBackColor = true;
+			this->btnDeleteItem->Click += gcnew System::EventHandler(this, &MyForm::btnDeleteItem_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1055, 643);
+			this->Controls->Add(this->btnDeleteItem);
 			this->Controls->Add(this->btnUpdateItem);
 			this->Controls->Add(this->txtItemID);
 			this->Controls->Add(this->btnAddItem);
@@ -264,5 +277,32 @@ namespace InventoryManagementSystem {
 			}
 		}
 
+		private: System::Void btnDeleteItem_Click(System::Object^ sender, System::EventArgs^ e) {
+			if (String::IsNullOrEmpty(txtItemID->Text)) {
+				MessageBox::Show("Lütfen silmek için bir ürün seçin!", "Uyarı", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+				return;
+			}
+
+			int itemID = Convert::ToInt32(txtItemID->Text);
+
+			// Kullanıcıdan silme işlemi için onay alalım
+			System::Windows::Forms::DialogResult result = MessageBox::Show(
+				"Bu ürünü silmek istediğinizden emin misiniz?", "Ürün Silme",
+				MessageBoxButtons::YesNo, MessageBoxIcon::Warning
+			);
+
+			if (result == System::Windows::Forms::DialogResult::Yes) {
+				DatabaseManager^ dbManager = gcnew DatabaseManager();
+				bool success = dbManager->DeleteItem(itemID);
+
+				if (success) {
+					MessageBox::Show("Ürün başarıyla silindi!", "Bilgi", MessageBoxButtons::OK, MessageBoxIcon::Information);
+					LoadInventoryData();  // **Silme sonrası DataGridView'i yenile**
+				}
+				else {
+					MessageBox::Show("Ürün silinirken hata oluştu.", "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				}
+			}
+		}
 };
 }
