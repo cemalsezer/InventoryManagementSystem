@@ -61,26 +61,39 @@ namespace InventoryManagementSystem {
     }
 
     bool DatabaseManager::AddNewItem(String^ itemName, int categoryId, int quantity, double unitPrice) {
-        try {
-            OpenConnection();
+        OpenConnection();
+        SqlTransaction^ transaction = sqlConnection->BeginTransaction();  // **İşlem başlat**
 
-            String^ query = "INSERT INTO Items (ItemName, CategoryID, Quantity, UnitPrice) VALUES (@itemName, @categoryId, @quantity, @unitPrice)";
-            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+        try {
+            String^ query = "EXEC sp_AddNewItem @itemName, @categoryId, @quantity, @unitPrice";
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection, transaction);
             cmd->Parameters->AddWithValue("@itemName", itemName);
             cmd->Parameters->AddWithValue("@categoryId", categoryId);
             cmd->Parameters->AddWithValue("@quantity", quantity);
             cmd->Parameters->AddWithValue("@unitPrice", unitPrice);
 
             int result = cmd->ExecuteNonQuery();
+
+            transaction->Commit();
             CloseConnection();
 
-            return result > 0;  // Eğer satır eklendiyse true döndür
+            return result > 0;
+        }
+        catch (SqlException^ ex) {
+            transaction->Rollback();
+            MessageBox::Show("SQL Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            CloseConnection();
+            return false;
         }
         catch (Exception^ ex) {
-            MessageBox::Show("Urun ekleme hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            transaction->Rollback();
+            MessageBox::Show("Bilinmeyen bir hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            CloseConnection();
             return false;
         }
     }
+
+
 
     DataTable^ DatabaseManager::GetCategories() {
         DataTable^ dt = gcnew DataTable();
@@ -98,43 +111,67 @@ namespace InventoryManagementSystem {
     }
 
     bool DatabaseManager::UpdateItem(int itemID, String^ itemName, int categoryId, int quantity, double unitPrice) {
-        try {
-            OpenConnection();
+        OpenConnection();
+        SqlTransaction^ transaction = sqlConnection->BeginTransaction();
 
-            String^ query = "UPDATE Items SET ItemName=@itemName, CategoryID=@categoryId, Quantity=@quantity, UnitPrice=@unitPrice WHERE ItemID=@itemID";
-            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+        try {
+            String^ query = "EXEC sp_UpdateItem @itemID, @itemName, @categoryId, @quantity, @unitPrice";
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection, transaction);
+            cmd->Parameters->AddWithValue("@itemID", itemID);
             cmd->Parameters->AddWithValue("@itemName", itemName);
             cmd->Parameters->AddWithValue("@categoryId", categoryId);
             cmd->Parameters->AddWithValue("@quantity", quantity);
             cmd->Parameters->AddWithValue("@unitPrice", unitPrice);
-            cmd->Parameters->AddWithValue("@itemID", itemID);
 
             int result = cmd->ExecuteNonQuery();
+
+            transaction->Commit();
             CloseConnection();
 
-            return result > 0;  // Eğer satır değiştiyse true döndür
+            return result > 0;
+        }
+        catch (SqlException^ ex) {
+            transaction->Rollback();
+            MessageBox::Show("SQL Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            CloseConnection();
+            return false;
         }
         catch (Exception^ ex) {
-            MessageBox::Show("Ürün güncelleme hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            transaction->Rollback();
+            MessageBox::Show("Bilinmeyen bir hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            CloseConnection();
             return false;
         }
     }
 
-    bool DatabaseManager::DeleteItem(int itemID) {
-        try {
-            OpenConnection();
 
-            String^ query = "DELETE FROM Items WHERE ItemID=@itemID";
-            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+
+    bool DatabaseManager::DeleteItem(int itemID) {
+        OpenConnection();
+        SqlTransaction^ transaction = sqlConnection->BeginTransaction();
+
+        try {
+            String^ query = "EXEC sp_DeleteItem @itemID";
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection, transaction);
             cmd->Parameters->AddWithValue("@itemID", itemID);
 
             int result = cmd->ExecuteNonQuery();
+
+            transaction->Commit();
             CloseConnection();
 
-            return result > 0;  // Eğer satır silindiyse true döndür
+            return result > 0;
+        }
+        catch (SqlException^ ex) {
+            transaction->Rollback();
+            MessageBox::Show("SQL Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            CloseConnection();
+            return false;
         }
         catch (Exception^ ex) {
-            MessageBox::Show("Ürün silme hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            transaction->Rollback();
+            MessageBox::Show("Bilinmeyen bir hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            CloseConnection();
             return false;
         }
     }
