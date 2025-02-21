@@ -3,7 +3,7 @@
 
 using namespace System;
 using namespace System::Windows::Forms;
-using namespace InventoryManagementSystem;  // Namespace ekleyelim
+using namespace InventoryManagementSystem;  
 
 [STAThread]
 int main(array<String^>^ args) {
@@ -11,7 +11,7 @@ int main(array<String^>^ args) {
     Application::SetCompatibleTextRenderingDefault(false);
 
     InventoryManagementSystem::DatabaseManager^ dbManager = gcnew InventoryManagementSystem::DatabaseManager();
-    dbManager->OpenConnection();  // Bağlantıyı test et
+    dbManager->OpenConnection();  
 
     InventoryManagementSystem::MyForm form;
     Application::Run(% form);

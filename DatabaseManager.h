@@ -7,7 +7,7 @@ namespace InventoryManagementSystem {
     public ref class DatabaseManager {
     private:
         String^ connectionString;
-        SqlConnection^ sqlConnection;  // **Eksikse ekle!**
+        SqlConnection^ sqlConnection;  
         bool isConnected;
 
     public:
@@ -15,11 +15,13 @@ namespace InventoryManagementSystem {
         bool OpenConnection();
         void CloseConnection();
         bool GetConnectionStatus();
-        DataTable^ GetInventoryData();  // **Eksikse ekle!**
+        DataTable^ GetInventoryData(); 
         DataTable^ GetCategories();
         bool AddNewItem(String^ itemName, int categoryId, int quantity, double unitPrice);  
         bool UpdateItem(int itemID, String^ itemName, int categoryId, int quantity, double unitPrice);
         bool DeleteItem(int itemID);
+        DataTable^ SearchItems(String^ searchQuery, int categoryId);
+
 
 
     };

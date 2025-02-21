@@ -48,6 +48,9 @@ namespace InventoryManagementSystem {
 	private: System::Windows::Forms::TextBox^ txtItemID;
 	private: System::Windows::Forms::Button^ btnUpdateItem;
 	private: System::Windows::Forms::Button^ btnDeleteItem;
+	private: System::Windows::Forms::TextBox^ txtSearch;
+	private: System::Windows::Forms::Button^ btnSearch;
+	private: System::Windows::Forms::ComboBox^ cmbFilterCategory;
 	protected:
 
 	private:
@@ -73,6 +76,9 @@ namespace InventoryManagementSystem {
 			this->txtItemID = (gcnew System::Windows::Forms::TextBox());
 			this->btnUpdateItem = (gcnew System::Windows::Forms::Button());
 			this->btnDeleteItem = (gcnew System::Windows::Forms::Button());
+			this->txtSearch = (gcnew System::Windows::Forms::TextBox());
+			this->btnSearch = (gcnew System::Windows::Forms::Button());
+			this->cmbFilterCategory = (gcnew System::Windows::Forms::ComboBox());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewInventory))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->BeginInit();
 			this->SuspendLayout();
@@ -162,11 +168,39 @@ namespace InventoryManagementSystem {
 			this->btnDeleteItem->UseVisualStyleBackColor = true;
 			this->btnDeleteItem->Click += gcnew System::EventHandler(this, &MyForm::btnDeleteItem_Click);
 			// 
+			// txtSearch
+			// 
+			this->txtSearch->Location = System::Drawing::Point(590, 376);
+			this->txtSearch->Name = L"txtSearch";
+			this->txtSearch->Size = System::Drawing::Size(100, 22);
+			this->txtSearch->TabIndex = 10;
+			// 
+			// btnSearch
+			// 
+			this->btnSearch->Location = System::Drawing::Point(603, 434);
+			this->btnSearch->Name = L"btnSearch";
+			this->btnSearch->Size = System::Drawing::Size(75, 23);
+			this->btnSearch->TabIndex = 11;
+			this->btnSearch->Text = L"Search";
+			this->btnSearch->UseVisualStyleBackColor = true;
+			this->btnSearch->Click += gcnew System::EventHandler(this, &MyForm::btnSearch_Click);
+			// 
+			// cmbFilterCategory
+			// 
+			this->cmbFilterCategory->FormattingEnabled = true;
+			this->cmbFilterCategory->Location = System::Drawing::Point(590, 405);
+			this->cmbFilterCategory->Name = L"cmbFilterCategory";
+			this->cmbFilterCategory->Size = System::Drawing::Size(121, 24);
+			this->cmbFilterCategory->TabIndex = 12;
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1055, 643);
+			this->Controls->Add(this->cmbFilterCategory);
+			this->Controls->Add(this->btnSearch);
+			this->Controls->Add(this->txtSearch);
 			this->Controls->Add(this->btnDeleteItem);
 			this->Controls->Add(this->btnUpdateItem);
 			this->Controls->Add(this->txtItemID);
@@ -206,6 +240,7 @@ namespace InventoryManagementSystem {
 	private: System::Void MyForm_Load(System::Object^ sender, System::EventArgs^ e) {
 		LoadInventoryData();
 		LoadCategories();
+		LoadFilterCategories();
 		DatabaseManager^ dbManager = gcnew DatabaseManager();
 
 		if (dbManager->OpenConnection()) {
@@ -303,6 +338,29 @@ namespace InventoryManagementSystem {
 					MessageBox::Show("Ürün silinirken hata oluştu.", "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
 				}
 			}
+		}
+		private: System::Void btnSearch_Click(System::Object^ sender, System::EventArgs^ e) {
+			String^ searchQuery = txtSearch->Text;
+			int categoryId = (cmbFilterCategory->SelectedIndex > 0) ? Convert::ToInt32(cmbFilterCategory->SelectedValue) : 0;
+
+			DatabaseManager^ dbManager = gcnew DatabaseManager();
+			DataTable^ dt = dbManager->SearchItems(searchQuery, categoryId);
+
+			dataGridViewInventory->DataSource = dt;
+		}
+
+		private: System::Void LoadFilterCategories() {
+			DatabaseManager^ dbManager = gcnew DatabaseManager();
+			DataTable^ dt = dbManager->GetCategories();
+
+			DataRow^ newRow = dt->NewRow();
+			newRow["CategoryID"] = 0;
+			newRow["CategoryName"] = "Tümü";
+			dt->Rows->InsertAt(newRow, 0);
+
+			cmbFilterCategory->DataSource = dt;
+			cmbFilterCategory->DisplayMember = "CategoryName";
+			cmbFilterCategory->ValueMember = "CategoryID";
 		}
 };
 }

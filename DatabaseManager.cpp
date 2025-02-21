@@ -139,5 +139,38 @@ namespace InventoryManagementSystem {
         }
     }
 
+    DataTable^ DatabaseManager::SearchItems(String^ searchQuery, int categoryId) {
+        DataTable^ dt = gcnew DataTable();
+        try {
+            OpenConnection();
+
+            // **Arama sorgusunu oluştur**
+            String^ query = "SELECT Items.ItemID, Items.ItemName, Categories.CategoryName, Items.Quantity, Items.UnitPrice "
+                "FROM Items INNER JOIN Categories ON Items.CategoryID = Categories.CategoryID "
+                "WHERE Items.ItemName LIKE @searchQuery";
+
+            // **Eğer kategori filtresi varsa, sorguya ekle**
+            if (categoryId > 0) {
+                query += " AND Items.CategoryID = @categoryId";
+            }
+
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+            cmd->Parameters->AddWithValue("@searchQuery", "%" + searchQuery + "%");
+
+            if (categoryId > 0) {
+                cmd->Parameters->AddWithValue("@categoryId", categoryId);
+            }
+
+            SqlDataAdapter^ adapter = gcnew SqlDataAdapter(cmd);
+            adapter->Fill(dt);
+
+            CloseConnection();
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show("Arama işlemi hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+        }
+        return dt;
+    }
+
 
 }
