@@ -51,6 +51,11 @@ namespace InventoryManagementSystem {
 	private: System::Windows::Forms::TextBox^ txtSearch;
 	private: System::Windows::Forms::Button^ btnSearch;
 	private: System::Windows::Forms::ComboBox^ cmbFilterCategory;
+	private: System::Windows::Forms::NumericUpDown^ numLowStockThreshold;
+	private: System::Windows::Forms::Button^ btnLowStockReport;
+	private: System::Windows::Forms::DataGridView^ dataGridViewLowStock;
+
+	private: System::Windows::Forms::Button^ btnExportCSV;
 	protected:
 
 	private:
@@ -79,14 +84,20 @@ namespace InventoryManagementSystem {
 			this->txtSearch = (gcnew System::Windows::Forms::TextBox());
 			this->btnSearch = (gcnew System::Windows::Forms::Button());
 			this->cmbFilterCategory = (gcnew System::Windows::Forms::ComboBox());
+			this->numLowStockThreshold = (gcnew System::Windows::Forms::NumericUpDown());
+			this->btnLowStockReport = (gcnew System::Windows::Forms::Button());
+			this->dataGridViewLowStock = (gcnew System::Windows::Forms::DataGridView());
+			this->btnExportCSV = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewInventory))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numLowStockThreshold))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewLowStock))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(999, 618);
+			this->label1->Location = System::Drawing::Point(1142, 772);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(44, 16);
 			this->label1->TabIndex = 0;
@@ -193,11 +204,52 @@ namespace InventoryManagementSystem {
 			this->cmbFilterCategory->Size = System::Drawing::Size(121, 24);
 			this->cmbFilterCategory->TabIndex = 12;
 			// 
+			// numLowStockThreshold
+			// 
+			this->numLowStockThreshold->Location = System::Drawing::Point(850, 389);
+			this->numLowStockThreshold->Name = L"numLowStockThreshold";
+			this->numLowStockThreshold->Size = System::Drawing::Size(120, 22);
+			this->numLowStockThreshold->TabIndex = 13;
+			// 
+			// btnLowStockReport
+			// 
+			this->btnLowStockReport->Location = System::Drawing::Point(808, 434);
+			this->btnLowStockReport->Name = L"btnLowStockReport";
+			this->btnLowStockReport->Size = System::Drawing::Size(93, 23);
+			this->btnLowStockReport->TabIndex = 14;
+			this->btnLowStockReport->Text = L"Show Report";
+			this->btnLowStockReport->UseVisualStyleBackColor = true;
+			this->btnLowStockReport->Click += gcnew System::EventHandler(this, &MyForm::btnLowStockReport_Click);
+			// 
+			// dataGridViewLowStock
+			// 
+			this->dataGridViewLowStock->ColumnHeadersHeightSizeMode = System::Windows::Forms::DataGridViewColumnHeadersHeightSizeMode::AutoSize;
+			this->dataGridViewLowStock->Location = System::Drawing::Point(783, 496);
+			this->dataGridViewLowStock->Name = L"dataGridViewLowStock";
+			this->dataGridViewLowStock->RowHeadersWidth = 51;
+			this->dataGridViewLowStock->RowTemplate->Height = 24;
+			this->dataGridViewLowStock->Size = System::Drawing::Size(403, 226);
+			this->dataGridViewLowStock->TabIndex = 15;
+			// 
+			// btnExportCSV
+			// 
+			this->btnExportCSV->Location = System::Drawing::Point(937, 434);
+			this->btnExportCSV->Name = L"btnExportCSV";
+			this->btnExportCSV->Size = System::Drawing::Size(92, 23);
+			this->btnExportCSV->TabIndex = 16;
+			this->btnExportCSV->Text = L"Export CSV";
+			this->btnExportCSV->UseVisualStyleBackColor = true;
+			this->btnExportCSV->Click += gcnew System::EventHandler(this, &MyForm::btnExportCSV_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1055, 643);
+			this->ClientSize = System::Drawing::Size(1198, 797);
+			this->Controls->Add(this->btnExportCSV);
+			this->Controls->Add(this->dataGridViewLowStock);
+			this->Controls->Add(this->btnLowStockReport);
+			this->Controls->Add(this->numLowStockThreshold);
 			this->Controls->Add(this->cmbFilterCategory);
 			this->Controls->Add(this->btnSearch);
 			this->Controls->Add(this->txtSearch);
@@ -216,6 +268,8 @@ namespace InventoryManagementSystem {
 			this->Load += gcnew System::EventHandler(this, &MyForm::MyForm_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewInventory))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numLowStockThreshold))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewLowStock))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -361,6 +415,59 @@ namespace InventoryManagementSystem {
 			cmbFilterCategory->DataSource = dt;
 			cmbFilterCategory->DisplayMember = "CategoryName";
 			cmbFilterCategory->ValueMember = "CategoryID";
+		}
+		private: System::Void btnLowStockReport_Click(System::Object^ sender, System::EventArgs^ e) {
+
+			int stockThreshold = Convert::ToInt32(numLowStockThreshold->Value);
+
+			DatabaseManager^ dbManager = gcnew DatabaseManager();
+			DataTable^ dt = dbManager->GetLowStockItems(stockThreshold);
+
+			dataGridViewLowStock->DataSource = dt;
+		}
+		private: System::Void btnExportCSV_Click(System::Object^ sender, System::EventArgs^ e) {
+			if (dataGridViewLowStock->Rows->Count == 0) {
+				MessageBox::Show("Önce bir rapor oluşturun!", "Uyarı", MessageBoxButtons::OK, MessageBoxIcon::Warning);
+				return;
+			}
+
+			SaveFileDialog^ saveFileDialog = gcnew SaveFileDialog();
+			saveFileDialog->Filter = "CSV files (*.csv)|*.csv";
+			saveFileDialog->Title = "Raporu Kaydet";
+			saveFileDialog->FileName = "LowStockReport.csv";
+
+			if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+				System::IO::StreamWriter^ file = gcnew System::IO::StreamWriter(saveFileDialog->FileName, false, System::Text::Encoding::UTF8);
+
+			
+				String^ separator = ","; 
+
+				for (int i = 0; i < dataGridViewLowStock->Columns->Count; i++) {
+					file->Write(dataGridViewLowStock->Columns[i]->HeaderText);
+					if (i < dataGridViewLowStock->Columns->Count - 1) file->Write(separator);
+				}
+				file->WriteLine();
+
+			
+				for (int i = 0; i < dataGridViewLowStock->Rows->Count; i++) {
+					for (int j = 0; j < dataGridViewLowStock->Columns->Count; j++) {
+						Object^ cellValue = dataGridViewLowStock->Rows[i]->Cells[j]->Value;
+						String^ value = (cellValue != nullptr) ? cellValue->ToString() : "";  
+
+						
+						if (value->Contains(",") || value->Contains(";")) {
+							value = "\"" + value + "\"";
+						}
+
+						file->Write(value);
+						if (j < dataGridViewLowStock->Columns->Count - 1) file->Write(separator);
+					}
+					file->WriteLine();
+				}
+
+				file->Close();
+				MessageBox::Show("Rapor başarıyla kaydedildi!", "Bilgi", MessageBoxButtons::OK, MessageBoxIcon::Information);
+			}
 		}
 };
 }

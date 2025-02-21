@@ -21,6 +21,8 @@ namespace InventoryManagementSystem {
         bool UpdateItem(int itemID, String^ itemName, int categoryId, int quantity, double unitPrice);
         bool DeleteItem(int itemID);
         DataTable^ SearchItems(String^ searchQuery, int categoryId);
+        DataTable^ GetLowStockItems(int stockThreshold);
+
 
 
 

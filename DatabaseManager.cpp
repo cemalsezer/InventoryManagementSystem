@@ -172,5 +172,28 @@ namespace InventoryManagementSystem {
         return dt;
     }
 
+    DataTable^ DatabaseManager::GetLowStockItems(int stockThreshold) {
+        DataTable^ dt = gcnew DataTable();
+        try {
+            OpenConnection();
+
+            String^ query = "SELECT Items.ItemID, Items.ItemName, Categories.CategoryName, Items.Quantity, Items.UnitPrice "
+                "FROM Items INNER JOIN Categories ON Items.CategoryID = Categories.CategoryID "
+                "WHERE Items.Quantity < @stockThreshold";
+
+            SqlCommand^ cmd = gcnew SqlCommand(query, sqlConnection);
+            cmd->Parameters->AddWithValue("@stockThreshold", stockThreshold);
+
+            SqlDataAdapter^ adapter = gcnew SqlDataAdapter(cmd);
+            adapter->Fill(dt);
+
+            CloseConnection();
+        }
+        catch (Exception^ ex) {
+            MessageBox::Show("Düşük stok raporu oluşturulurken hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+        }
+        return dt;
+    }
+
 
 }
