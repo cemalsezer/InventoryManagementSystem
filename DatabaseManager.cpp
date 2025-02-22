@@ -23,7 +23,7 @@ namespace InventoryManagementSystem {
             MessageBox::Show("SQL Baglanti Hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         catch (Exception^ ex) {  // Genel bağlantı hatalarını yakalar
-            MessageBox::Show("Bağlanti hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Baglanti hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         isConnected = false;
         return false;
@@ -40,7 +40,7 @@ namespace InventoryManagementSystem {
         return isConnected;
     }
 
-    // 🔹 **SQL Server'dan Verileri Çekme (DataGridView İçin)**
+    // SQL Server'dan Verileri Çekme (DataGridView İçin)
     DataTable^ DatabaseManager::GetInventoryData() {
         DataTable^ dt = gcnew DataTable();
         try {
@@ -81,13 +81,13 @@ namespace InventoryManagementSystem {
         }
         catch (SqlException^ ex) {
             transaction->Rollback();
-            MessageBox::Show("SQL Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("SQL Hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
             CloseConnection();
             return false;
         }
         catch (Exception^ ex) {
             transaction->Rollback();
-            MessageBox::Show("Bilinmeyen bir hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Bilinmeyen bir hata olustu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
             CloseConnection();
             return false;
         }
@@ -132,13 +132,13 @@ namespace InventoryManagementSystem {
         }
         catch (SqlException^ ex) {
             transaction->Rollback();
-            MessageBox::Show("SQL Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("SQL Hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
             CloseConnection();
             return false;
         }
         catch (Exception^ ex) {
             transaction->Rollback();
-            MessageBox::Show("Bilinmeyen bir hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Bilinmeyen bir hata olustu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
             CloseConnection();
             return false;
         }
@@ -164,13 +164,13 @@ namespace InventoryManagementSystem {
         }
         catch (SqlException^ ex) {
             transaction->Rollback();
-            MessageBox::Show("SQL Hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("SQL Hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
             CloseConnection();
             return false;
         }
         catch (Exception^ ex) {
             transaction->Rollback();
-            MessageBox::Show("Bilinmeyen bir hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Bilinmeyen bir hata olustu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
             CloseConnection();
             return false;
         }
@@ -204,7 +204,7 @@ namespace InventoryManagementSystem {
             CloseConnection();
         }
         catch (Exception^ ex) {
-            MessageBox::Show("Arama işlemi hatası: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Arama islemi hatasi: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         return dt;
     }
@@ -227,7 +227,7 @@ namespace InventoryManagementSystem {
             CloseConnection();
         }
         catch (Exception^ ex) {
-            MessageBox::Show("Düşük stok raporu oluşturulurken hata oluştu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
+            MessageBox::Show("Dusuk stok raporu olusturulurken hata olustu: " + ex->Message, "Hata", MessageBoxButtons::OK, MessageBoxIcon::Error);
         }
         return dt;
     }
