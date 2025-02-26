@@ -338,7 +338,7 @@ namespace InventoryManagementSystem {
 			this->Controls->Add(this->dataGridViewInventory);
 			this->Controls->Add(this->label1);
 			this->Name = L"MyForm";
-			this->Text = L"MyForm";
+			this->Text = L"Inventory Management System";
 			this->Load += gcnew System::EventHandler(this, &MyForm::MyForm_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridViewInventory))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numQuantity))->EndInit();
