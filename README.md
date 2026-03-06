@@ -2,6 +2,9 @@
 
 Bu proje, **C++ (C++/CLI) ve .NET Windows Forms** kullanılarak geliştirilmiş bir masaüstü Envanter Yönetim Sistemi uygulamasıdır. Kullanıcıların ürün stoklarını, veritabanı entegrasyonu ile güvenli ve kolay bir şekilde takip etmelerini sağlamak amacıyla tasarlanmıştır.
 
+- Youtube: [https://www.youtube.com/watch?v=AGP3M1tXoGE](https://www.youtube.com/watch?v=AGP3M1tXoGE)
+
+
 ## ✨ Öne Çıkan Özellikler
 
 * **Kullanıcı Dostu Arayüz:** Windows Forms ile tasarlanmış sade ve anlaşılır grafiksel kullanıcı arayüzü (GUI).
